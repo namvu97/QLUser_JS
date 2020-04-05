@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="main">
+        <div class="top">
+            <input id="inputSearch" type="text" placeholder="Search by name">
+            <button onClick="searchUser()"><i class="fa fa-search" aria-hidden="true"></i></button>
+            <button class="btn-addUser" onclick="openForm()">Add</button>
+        </div>
+        <div class="addUser">
+            <div id="form-user">
+                <form action="">
+                    <input id="id" name="id" type="text" hidden>
+                    <p>
+                        <label for="name">Tên</label>
+                        <input id="name" name="name" type="text" required>
+                    </p>
+                    <p>
+                        <label for="address">Địa chỉ</label>
+                        <input id="address" name="address" type="text" required>
+                    </p>
+                    <p>
+                        <label for="phone">Số điện thoại</label>
+                        <input id="phone" name="phone" type="text" required>
+                    </p>
+                    <p>
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" required>
+                    </p>
+                    <p>
+                        <button id="Oke">Oke</button>
+                        <button id="Cancel">Cancel</button>
+                    </p>
+                </form>
+            </div>
+        </div>
+        <div id="table">
+
+        </div>
+        <!-- <table id="myTable" style="width:100%">
+            <tr>
+                <th>#</th>
+                <th>Tên</th>
+                <th>Địa chỉ</th>
+                <th>Điện thoại</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Nguyễn Văn A</td>
+                <td>Hà Nội</td>
+                <td>0123456789</td>
+                <td>nva@gmail.com</td>
+                <td>
+                    <button>Edit</button>
+                    <button>Delete</button>
+                </td>
+            </tr>
+        </table> -->
+    </div>
+    <script>
+        let myArray, newArray = [];
+        if(localStorage.getItem("myArray") === null) myArray = [];
+        else myArray = JSON.parse(localStorage.getItem("myArray"));
+        function openForm(id='', name='', address='', phone='', email='') {
+            document.getElementById("id").value = id;
+            document.getElementById("name").value = name;
+            document.getElementById("address").value = address;
+            document.getElementById("phone").value = phone;
+            document.getElementById("email").value = email;
+            document.getElementById("form-user").style.display = "block";
+        }
+        myFunction = function() {
+            let onScreen = [];
+            console.log("newArray: " + newArray)
+            if(newArray != "")  onScreen = myArray.filter( (item) => newArray.includes(item));
+            else onScreen = myArray;
+            console.log(onScreen);
+            let html = '<table id="myTable"><tr><th>#</th><th>Tên</th><th>Địa chỉ</th><th>Điện thoại</th><th>Email</th><th>Action</th></tr>'
+                if(onScreen !== null){
+                    for(let i=0; i < onScreen.length; i++){
+                        html+=`<tr><td>${i+1}</td>`;
+                        html+=`<td>${onScreen[i].name}</td>`;
+                        html+=`<td>${onScreen[i].address}</td>`;
+                        html+=`<td>${onScreen[i].phone}</td>`;
+                        html+=`<td>${onScreen[i].email}</td>`;
+                        html+=`<td><button id="edit" onclick="openForm(id='${onScreen[i].id}', name='${onScreen[i].name}', address='${onScreen[i].address}', phone='${onScreen[i].phone}', email='${onScreen[i].email}')">Edit</button>&nbsp;&nbsp;<button onclick="deleteForm(id='${onScreen[i].id}')" id="delete">Delete</button></td></tr>`
+                    }
+                }
+            html+='</table>'
+            document.getElementById("table").innerHTML = html;
+        }
+        myFunction();
+        document.getElementById('Oke').onclick = function (event) {
+            let id = document.getElementById("id").value;
+            let name = document.getElementById("name").value;
+            let address = document.getElementById("address").value;
+            let phone = document.getElementById("phone").value;
+            let email = document.getElementById("email").value;
+            console.log('id = ' + id);
+            let addEditUser = {id, name, address, phone, email};
+            console.log(addEditUser)
+            if(id === ''){
+                id = myArray.length;
+                myArray.push({id, name, address, phone, email});
+            }
+            else {
+                console.log(id, myArray)
+                let newArray = myArray.find( (item) => item.id == id);
+                myArray[newArray.id] = addEditUser;
+                console.log(newArray.id)
+            }
+            if(name == "" || address == "" || phone == "" || email == "") {
+                alert("Information must be filled out");
+                return false;
+            }
+            localStorage.setItem("myArray", JSON.stringify(myArray));
+            
+            document.getElementById("form-user").style.display = "none";
+            myFunction();
+        }
+
+        document.getElementById('Cancel').onclick = function () {
+            document.getElementById("form-user").style.display = "none";
+        }
+
+        function deleteForm(myId) {
+            let result = confirm("Are You Sure?");
+            if(result == true){
+                console.log(myId);
+                myArray = myArray.filter( (item) => item.id != myId);
+                console.log(myArray);
+                localStorage.setItem("myArray", JSON.stringify(myArray));
+                myFunction();
+            }
+        }
+
+        function searchUser() {
+            let inputValue = document.getElementById("inputSearch").value;
+            console.log("oke")
+            console.log(inputValue);
+            // let newArray = myArray.filter( (item) => item.name == inputValue);
+            newArray = myArray.filter( (item) => item.name.indexOf(inputValue) > -1);
+            console.log(newArray);
+            myFunction();
+        }
+    </script>
+</body>
+</html>
